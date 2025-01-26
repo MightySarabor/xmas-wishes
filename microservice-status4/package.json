@@ -1,0 +1,12 @@
+{
+  "name": "microservice-status4",
+  "version": "1.0.0",
+  "description": "Microservice for processing wishes with status 4",
+  "main": "index.js",
+  "scripts": {
+    "start": "node index.js"
+  },
+  "dependencies": {
+    "kafkajs": "^2.2.0"
+  }
+}

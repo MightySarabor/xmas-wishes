@@ -1,0 +1,12 @@
+{
+  "name": "microservice-json",
+  "version": "1.0.0",
+  "description": "Microservice for processing wishes using Kafka",
+  "main": "index.js",
+  "scripts": {
+    "start": "node index.js"
+  },
+  "dependencies": {
+    "kafkajs": "^2.2.0"
+  }
+}

@@ -1,0 +1,99 @@
+version: '3.8'
+services:
+  zookeeper:
+    image: confluentinc/cp-zookeeper:latest
+    container_name: zookeeper
+    environment:
+      ZOOKEEPER_CLIENT_PORT: 2181
+      ZOOKEEPER_TICK_TIME: 2000
+    ports:
+      - "2181:2181"
+    networks:
+      - kafka_network
+  
+  kafka:
+    image: confluentinc/cp-kafka:latest
+    container_name: kafka
+    environment:
+      KAFKA_BROKER_ID: 1
+      KAFKA_ZOOKEEPER_CONNECT: zookeeper:2181
+      KAFKA_ADVERTISED_LISTENERS: PLAINTEXT://kafka:9092
+      KAFKA_LISTENERS: PLAINTEXT://0.0.0.0:9092
+      KAFKA_OFFSETS_TOPIC_REPLICATION_FACTOR: 1
+    depends_on:
+      - zookeeper
+    ports:
+      - "9092:9092"
+    networks:
+      - kafka_network
+  
+  microservice-status1:
+    build:
+      context: ./microservice-status1
+    container_name: microservice-status1
+    depends_on:
+      - kafka
+    networks:
+      - kafka_network
+  
+  microservice-status2:
+    build:
+      context: ./microservice-status2
+    container_name: microservice-status2
+    depends_on:
+      - kafka
+    networks:
+      - kafka_network
+  
+  microservice-status3:
+    build:
+      context: ./microservice-status3
+    container_name: microservice-status3
+    depends_on:
+      - kafka
+    networks:
+      - kafka_network
+  
+  microservice-status4:
+    build:
+      context: ./microservice-status4
+    container_name: microservice-status4
+    depends_on:
+      - kafka
+    networks:
+      - kafka_network
+  
+  api:
+    build:
+      context: .
+      dockerfile: Dockerfile
+    container_name: api
+    ports:
+      - "3000:3000"
+    networks:
+      - kafka_network
+    depends_on:
+      - kafka
+
+  microservice-camel:
+    build:
+      context: ./microservice-camel/camelservice
+    container_name: microservice-camel
+    depends_on:
+      - kafka
+    networks:
+      - kafka_network
+
+  pdf-service:
+    build: .
+    ports:
+      - "3001:3001"
+    depends_on:
+      - kafka
+    environment:
+      - KAFKA_BROKERS=kafka:9092
+
+
+networks:
+  kafka_network:
+    driver: bridge
